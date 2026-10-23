@@ -14,13 +14,11 @@ education or less, across the Federal Reserve's Survey of Consumer Finances
 | Wealth | `NETWORTH` | weighted mean, in the constant dollars of the extract release |
 | Weight | `WGT` | computed within each of the 5 implicates, then averaged |
 
-The `EDCL` code meanings above are the commonly documented ones. They are
-**not yet verified against the Fed's variable-definition file**, because
-`federalreserve.gov` was blocked from the environment where this was written.
-`get_data.py` will not build the analysis file without that file, and it
-writes the `EDCL` and `KIDS` code to `data/processed/definitions_excerpt.txt`.
-Read that excerpt before running `plot.py`, and update this README if it
-differs.
+The `EDCL` codes have been checked against the Federal Reserve's official
+2025 `bulletin.macro.txt` (education-of-reference-person definition). The
+macro also defines `KIDS` from the family relationship roster, including
+natural, step- and foster children. The download script saves the relevant
+macro code to `data/processed/definitions_excerpt.txt` for audit.
 
 ## Files
 
@@ -31,10 +29,26 @@ All files come from the Fed's SCF pages (`https://www.federalreserve.gov/econres
 | `bulletin.macro.txt` | "SAS macro – Variable Definitions (TXT)" | definitions of `EDCL`, `KIDS`, `NETWORTH` |
 | `scfp1989s.zip` … `scfp2025s.zip` (13 files) | "Summary Extract Public Data", Stata version | the data, one file per survey year |
 
-The file names are the expected `https://www.federalreserve.gov/econres/files/<name>`
+The file names are the official `https://www.federalreserve.gov/econres/files/<name>`
 pattern; if a link on a year page differs, save it under the name above.
 Download all extracts from the **same (current) release** so every year is in
 the same constant dollars.
+
+## POLISCI 158 Section 03 submission
+
+This repository implements Option B: the family-wealth-by-parental-education
+reproduction using original Federal Reserve public SCF extracts, not values
+traced from an image. The required deliverables are `get_data.py`, `plot.py`,
+`figure.png`, and this README. `figure.png` is generated only after the real
+data download and plotting steps succeed. The automated GitHub Actions run
+is available under **Actions → Reproduce SCF figure**.
+
+**Original source:** https://www.federalreserve.gov/econres/scfindex.htm
+
+**Method:** Keep families with `KIDS > 0`, split by reference-person `EDCL`
+(4 versus 1–2), compute weighted mean `NETWORTH` within each implicate using
+`WGT`, and average the five implicate estimates by year. Plot group means
+and their ratio, 1989–2025, in constant 2025 dollars.
 
 ## Usage
 
@@ -51,8 +65,9 @@ python plot.py                # results/*.csv and figures/*.png
   SCF reference person has typically been the man in a mixed-sex couple (or
   the older partner in a same-sex couple), so a more-educated mother does not
   move the family into the college group. Unverified here; check the codebook.
-- **`KIDS` definition.** Who counts (age limit, step/foster children, adult
-  children at home) depends on the macro definition; check the excerpt.
+- **`KIDS` definition.** The Federal Reserve macro counts children from
+  family relationship codes (including natural, step and foster children).
+  This is not identical to a generic under-18-child definition.
 - **Education coding changed in 2016** (years of schooling → highest degree).
   `EDCL` is meant to be harmonized, but the break may still shift the groups.
 - **Means are tail-driven.** The SCF oversamples very wealthy families; mean
