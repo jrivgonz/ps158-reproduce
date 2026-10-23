@@ -161,7 +161,7 @@ def check(df, year):
     """Sanity checks that would catch a wrong file or a changed coding."""
     implicate = df["y1"] - 10 * df["yy1"]
     if not implicate.between(1, 5).all():
-        sample = df[["y1", "yy1"]].head(12).to_string(index=False)
+        sample = df.loc[~implicate.between(1, 5), ["y1", "yy1"]].head(20).to_string(index=False)
         raise ValueError(f"{year}: Y1 is not YY1*10 + implicate(1-5); sample:\n{sample}")
     if not (df.groupby("yy1").size() == 5).all():
         raise ValueError(f"{year}: some households do not have exactly 5 implicates")
