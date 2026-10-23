@@ -48,7 +48,7 @@ is available under **Actions → Reproduce SCF figure**.
 **Method:** Keep families with `KIDS > 0`, split by reference-person `EDCL`
 (4 versus 1–2), compute weighted mean `NETWORTH` within each implicate using
 `WGT`, and average the five implicate estimates by year. Plot group means
-and their ratio, 1989–2025, in constant 2025 dollars.
+as a single academic-journal-style chart, 1989–2025, in constant 2025 dollars.\nThe wealth ratio is retained in the results CSV as an additional statistic.
 
 ## Reproduction result
 
@@ -64,11 +64,11 @@ degree or more had mean net worth of approximately **$2.29 million**, versus
 are in 2025 dollars. These are descriptive weighted means, not causal effects
 of education, and no uncertainty intervals are shown.
 
-**Comparison caveat:** The figure follows the specified SCF population and
-variable definitions, but a pixel-by-pixel comparison with the course's
-reference dry-run figure has not been verified. Small methodological differences
-(such as whether the reference uses medians, a different child definition, or
-other education categories) could change the result.
+**Style comparison:** The final figure follows the course's recommended academic
+journal example: monochrome lines, circle and square markers, a single plot,
+labeled axes, and a numbered caption with a source note below. The data trend
+and approximate endpoints agree with the example shown in the section guide.
+A pixel-by-pixel numerical comparison has not been performed.
 
 ## Usage
 
