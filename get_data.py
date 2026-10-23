@@ -159,7 +159,9 @@ def read_extract(path):
 
 def check(df, year):
     """Sanity checks that would catch a wrong file or a changed coding."""
-    implicate = df["y1"] - 10 * df["yy1"]
+    # Cast before multiplying: some Stata ID columns are int16 and overflow
+    # above household ID 3276 if arithmetic stays in that dtype.
+    implicate = df["y1"].astype("int64") - 10 * df["yy1"].astype("int64")
     if not implicate.between(1, 5).all():
         sample = df.loc[~implicate.between(1, 5), ["y1", "yy1"]].head(20).to_string(index=False)
         raise ValueError(f"{year}: Y1 is not YY1*10 + implicate(1-5); sample:\n{sample}")
