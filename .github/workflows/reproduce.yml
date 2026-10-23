@@ -1,0 +1,50 @@
+name: Reproduce SCF figure
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "claude/wealth-gap-parental-education-2w6a60"
+    paths:
+      - "get_data.py"
+      - "plot.py"
+      - "requirements.txt"
+      - ".github/workflows/reproduce.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Check out project
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install requirements
+        run: pip install -r requirements.txt
+      - name: Download original Federal Reserve data
+        run: python get_data.py
+      - name: Reproduce figure from downloaded data
+        run: python plot.py
+      - name: Save submission outputs to repository
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add figure.png figures/ results/
+          if ! git diff --cached --quiet; then
+            git commit -m "Add SCF figure reproduced from original Federal Reserve data"
+            git push
+          fi
+      - name: Upload outputs for download
+        uses: actions/upload-artifact@v4
+        with:
+          name: scf-reproduction
+          path: |
+            figure.png
+            figures/
+            results/
