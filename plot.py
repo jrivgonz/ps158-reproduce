@@ -79,59 +79,66 @@ def style(ax):
 
 
 def plot(res):
-    fig, (top, bottom) = plt.subplots(
-        2, 1, figsize=(8, 7.5), sharex=True, height_ratios=[2, 1],
-        facecolor=SURFACE, layout="constrained")
-    years = res["year"]
+    """Academic-journal styling based on the POLISCI 158 Section 03 lab example.
 
-    series = ((COLLEGE, "mean_networth_bachelors_plus"), (HS, "mean_networth_hs_or_less"))
-    for group, col in series:
-        top.plot(years, res[col] / 1000, color=COLORS[group], linewidth=2, marker="o",
-                 markersize=5, markeredgecolor=SURFACE, markeredgewidth=1.5, label=group)
-    # Latest values as end labels, nudged apart when the two lines end close together.
-    ends = {g: res[c].iloc[-1] / 1000 for g, c in series}
-    hi, lo = sorted(ends, key=ends.get, reverse=True)
-    for group, nudge in ((hi, 7), (lo, -7)):
-        top.annotate(f"${ends[group]:,.0f}k", (years.iloc[-1], ends[group]),
-                     xytext=(8, nudge), textcoords="offset points", va="center",
-                     fontsize=9, color=INK_2)
-    style(top)
-    top.set_ylim(bottom=0)
-    top.yaxis.set_major_formatter(lambda v, _: f"${v:,.0f}k")
-    top.set_title("Mean net worth, families with children (thousands of constant dollars)",
-                  loc="left", fontsize=10, color=INK_2)
-    top.legend(frameon=False, loc="upper left", fontsize=9, labelcolor=INK_2)
+    A single monochrome panel, distinct line/marker styles, labeled axes,
+    a numbered caption and source note beneath the figure.
+    """
+    fig = plt.figure(figsize=(8.6, 6.25), facecolor="white")
+    ax = fig.add_axes([0.105, 0.315, 0.845, 0.60])
+    years = res["year"].to_numpy()
+    ba = res["mean_networth_bachelors_plus"].to_numpy() / 1000
+    hs = res["mean_networth_hs_or_less"].to_numpy() / 1000
 
-    bottom.plot(years, res["ratio"], color=INK_2, linewidth=2, marker="o",
-                markersize=5, markeredgecolor=SURFACE, markeredgewidth=1.5)
-    bottom.annotate(f"{res['ratio'].iloc[-1]:.1f}x", (years.iloc[-1], res["ratio"].iloc[-1]),
-                    xytext=(8, 0), textcoords="offset points", va="center",
-                    fontsize=9, color=INK_2)
-    style(bottom)
-    bottom.set_ylim(bottom=0)
-    bottom.yaxis.set_major_formatter(lambda v, _: f"{v:g}x")
-    bottom.set_title("Ratio: bachelor's or more ÷ high school or less",
-                     loc="left", fontsize=10, color=INK_2)
-    bottom.set_xticks(years)
-    bottom.set_xlim(years.min() - 1, years.max() + 4)
+    ax.plot(years, ba, color="#222222", linestyle="-", linewidth=1.4,
+            marker="o", markersize=4.8, markerfacecolor="white",
+            markeredgecolor="#222222", markeredgewidth=1.1,
+            label="BA or more")
+    ax.plot(years, hs, color="#555555", linestyle="--", linewidth=1.3,
+            marker="s", markersize=4.5, markerfacecolor="white",
+            markeredgecolor="#555555", markeredgewidth=1.0,
+            label="HS or less")
 
-    fig.suptitle("Wealth gap by the education of the family's reference person, "
-                 f"{years.min()}–{years.max()}", x=0.01, ha="left",
-                 fontsize=12, color=INK, fontweight="bold")
-    fig.text(0.01, -0.02,
-             "Source: Federal Reserve Survey of Consumer Finances, summary extract. "
-             "Families with KIDS > 0; education is EDCL of the reference person;\n"
-             "some college excluded. Weighted by WGT, averaged over the five implicates. "
-             "Dollars as published in the extract release used.",
-             fontsize=8, color=MUTED, ha="left", va="top")
+    ax.set_xlim(1988, 2026)
+    ax.set_ylim(0, 2400)
+    ax.set_xticks(years)
+    ax.set_xticklabels([str(y) for y in years], fontsize=8)
+    ax.set_yticks(np.arange(0, 2401, 400))
+    ax.yaxis.set_major_formatter(lambda v, _: f"{v:,.0f}")
+    ax.tick_params(axis="both", labelsize=8, direction="out",
+                   width=0.65, length=3.0, colors="#222222")
+    ax.set_ylabel("Mean net worth (thousands of 2025 dollars)", fontsize=9)
+    ax.set_xlabel("Survey year", fontsize=9)
+    for spine in ax.spines.values():
+        spine.set_color("#222222")
+        spine.set_linewidth(0.7)
+    ax.grid(False)
+    ax.legend(loc="upper left", bbox_to_anchor=(0.0, 1.02),
+              frameon=False, ncol=2, fontsize=9,
+              handlelength=2.6, columnspacing=2.5)
+
+    caption = (
+        "Figure 1. Mean net worth of families with children, by education of reference person, "
+        "1989–2025."
+    )
+    note = (
+        "Note: Families with a child of the reference person living at home. Values in September-2025 "
+        "dollars, adjusted with the CPI-U-RS.\n"
+        "Source: Federal Reserve Board, Survey of Consumer Finances, 1989–2025 summary extract public data.\n"
+        "Weighted means across five implicates; BA = bachelor's degree or more; HS = high school or less; "
+        "some college excluded."
+    )
+    fig.text(0.105, 0.235, caption, ha="left", va="top",
+             fontsize=9.2, color="#111111", fontfamily="serif")
+    fig.text(0.105, 0.188, note, ha="left", va="top",
+             fontsize=7.8, color="#333333", linespacing=1.45)
 
     FIGURES.mkdir(exist_ok=True)
     path = FIGURES / "mean_networth_by_education.png"
-    fig.savefig(path, dpi=200, bbox_inches="tight", facecolor=SURFACE)
+    fig.savefig(path, dpi=220, facecolor="white")
     print(f"wrote {path.relative_to(ROOT)}")
-    # Submission-friendly top-level figure as requested by the section rubric.
     submission_path = ROOT / "figure.png"
-    fig.savefig(submission_path, dpi=200, bbox_inches="tight", facecolor=SURFACE)
+    fig.savefig(submission_path, dpi=220, facecolor="white")
     print(f"wrote {submission_path.relative_to(ROOT)}")
     plt.close(fig)
 
