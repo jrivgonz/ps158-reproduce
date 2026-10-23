@@ -129,6 +129,11 @@ def plot(res):
     path = FIGURES / "mean_networth_by_education.png"
     fig.savefig(path, dpi=200, bbox_inches="tight", facecolor=SURFACE)
     print(f"wrote {path.relative_to(ROOT)}")
+    # Submission-friendly top-level figure as requested by the section rubric.
+    submission_path = ROOT / "figure.png"
+    fig.savefig(submission_path, dpi=200, bbox_inches="tight", facecolor=SURFACE)
+    print(f"wrote {submission_path.relative_to(ROOT)}")
+    plt.close(fig)
 
 
 def main():
