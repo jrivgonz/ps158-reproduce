@@ -50,6 +50,26 @@ is available under **Actions → Reproduce SCF figure**.
 `WGT`, and average the five implicate estimates by year. Plot group means
 and their ratio, 1989–2025, in constant 2025 dollars.
 
+## Reproduction result
+
+The automated run successfully downloaded all 13 original Federal Reserve
+summary extracts (1989–2025), computed the weighted means from those files,
+and generated [`figure.png`](figure.png). The underlying estimates are saved
+in [`results/mean_networth_by_education.csv`](results/mean_networth_by_education.csv).
+
+In 2025, families with children whose reference person held a bachelor's
+degree or more had mean net worth of approximately **$2.29 million**, versus
+**$269,180** for families with a high-school education or less: a ratio of
+**8.51 to 1**. In 1989, the corresponding ratio was **4.66 to 1**. All amounts
+are in 2025 dollars. These are descriptive weighted means, not causal effects
+of education, and no uncertainty intervals are shown.
+
+**Comparison caveat:** The figure follows the specified SCF population and
+variable definitions, but a pixel-by-pixel comparison with the course's
+reference dry-run figure has not been verified. Small methodological differences
+(such as whether the reference uses medians, a different child definition, or
+other education categories) could change the result.
+
 ## Usage
 
 ```
