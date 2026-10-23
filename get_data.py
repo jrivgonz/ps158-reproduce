@@ -33,6 +33,7 @@ YEARS = list(range(1989, 2026, 3))  # 1989, 1992, ..., 2025
 BASE_URL = "https://www.federalreserve.gov/econres/files/"
 MACRO_FILE = "bulletin.macro.txt"
 KEEP = ["yy1", "y1", "wgt", "networth", "edcl", "kids"]
+SOURCE_COLUMNS = KEEP + ["xx1", "x1"]  # 1989 uses the X-prefixed identifiers
 DEFINED_VARS = ["EDCL", "KIDS"]
 
 ROOT = Path(__file__).resolve().parent
@@ -138,10 +139,18 @@ def read_extract(path):
             df = reader.read()
             labels = reader.variable_labels()
     else:
-        df = pd.read_csv(raw, usecols=lambda c: c.lower() in KEEP)
+        df = pd.read_csv(raw, usecols=lambda c: c.lower() in SOURCE_COLUMNS)
 
     df.columns = [c.lower() for c in df.columns]
     labels = {k.lower(): v for k, v in labels.items()}
+    # The 1989 extract uses X1/XX1 where later public extracts use Y1/YY1.
+    # Both represent replicate-specific ID and stable family ID, respectively.
+    if "y1" not in df.columns and "x1" in df.columns:
+        df = df.rename(columns={"x1": "y1"})
+        labels["y1"] = labels.get("x1", "")
+    if "yy1" not in df.columns and "xx1" in df.columns:
+        df = df.rename(columns={"xx1": "yy1"})
+        labels["yy1"] = labels.get("xx1", "")
     missing = [c for c in KEEP if c not in df.columns]
     if missing:
         raise ValueError(f"{path.name} lacks variables {missing}")
